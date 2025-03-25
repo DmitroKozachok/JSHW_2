@@ -1,0 +1,136 @@
+﻿<div class="d-flex justify-content-center align-items-center my-5">
+    <div class="col-md-6 col-lg-4">
+        <div class="p-4 p-md-5 border rounded-3 bg-body-tertiary shadow">
+            <h2 class="text-center mb-4">Реєстрація</h2>
+
+            <div class="text-center mb-3">
+                <img id="previewImage" src="/images/noImage.png" class="img-fluid rounded-circle border"
+                     style="width: 100px; height: 100px; object-fit: cover;" />
+                <div class="mt-2">
+                    <input type="file" id="imageInput" class="d-none" accept="image/*">
+                    <button class="btn btn-outline-success btn-sm" id="chooseImageBtn">Обрати зображення</button>
+                </div>
+            </div>
+
+            <form>
+                <div class="mb-3">
+                    <label class="form-label">Ім'я</label>
+                    <input type="text" class="form-control" placeholder="Введіть ім'я">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Прізвище</label>
+                    <input type="text" class="form-control" placeholder="Введіть прізвище">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Номер телефону</label>
+                    <input type="tel" class="form-control" placeholder="+380XXXXXXXXX">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Електронна пошта</label>
+                    <input type="email" class="form-control" placeholder="example@email.com">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Пароль</label>
+                    <input type="password" class="form-control" placeholder="Введіть пароль">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Повторіть пароль</label>
+                    <input type="password" class="form-control" placeholder="Повторіть пароль">
+                </div>
+
+                <div class="form-check mb-3">
+                    <input type="checkbox" class="form-check-input" id="terms">
+                    <label class="form-check-label" for="terms">Я приймаю політику компанії</label>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-success fs-5">Зареєструватися</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const imageInput = document.getElementById("imageInput");
+    const chooseImageBtn = document.getElementById("chooseImageBtn");
+    const previewImage = document.getElementById("previewImage");
+    const modalImage = document.getElementById("modalImage");
+    const rotateLeftBtn = document.getElementById("rotateLeft");
+    const rotateRightBtn = document.getElementById("rotateRight");
+    const saveImageBtn = document.getElementById("saveImage");
+    const cancelBtn = document.getElementById("cancelImage");
+    const imageModal = new bootstrap.Modal(document.getElementById("imageModal"));
+
+    let cropper;
+    let uploadedImageURL = null;
+    let tempImageSrc = previewImage.src;
+
+    chooseImageBtn.addEventListener("click", function () {
+        imageInput.click();
+    });
+
+    imageInput.addEventListener("change", function (e) {
+        const file = e.target.files[0];
+
+        if (/^image\/\w+/.test(file.type)) {
+            if (uploadedImageURL) {
+                URL.revokeObjectURL(uploadedImageURL);
+            }
+
+            uploadedImageURL = URL.createObjectURL(file);
+            modalImage.src = uploadedImageURL;
+            previewImage.src = uploadedImageURL;
+
+            imageModal.show();
+
+            modalImage.onload = function () {
+                if (cropper) {
+                    cropper.destroy();
+                }
+
+                cropper = new Cropper(modalImage, {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    autoCrop: true
+                });
+            };
+        }
+    });
+
+    rotateLeftBtn.addEventListener("click", function () {
+        if (cropper) {
+            cropper.rotate(-90);
+        }
+    });
+
+    rotateRightBtn.addEventListener("click", function () {
+        if (cropper) {
+            cropper.rotate(90);
+        }
+    });
+
+    saveImageBtn.addEventListener("click", function () {
+        if (cropper) {
+            const croppedCanvas = cropper.getCroppedCanvas();
+            if (croppedCanvas) {
+                previewImage.src = croppedCanvas.toDataURL("image/png");
+                tempImageSrc = previewImage.src;
+                imageModal.hide();
+            }
+        }
+    });
+
+    cancelBtn.addEventListener("click", function () {
+        previewImage.src = tempImageSrc;
+        if (cropper) {
+            cropper.destroy();
+        }
+        imageModal.hide();
+    });
+</script> 
