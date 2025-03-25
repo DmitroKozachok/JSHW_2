@@ -65,7 +65,8 @@
     const rotateRightBtn = document.getElementById("rotateRight");
     const saveImageBtn = document.getElementById("saveImage");
     const cancelBtn = document.getElementById("cancelImage");
-    const imageModal = new bootstrap.Modal(document.getElementById("imageModal"));
+    const imageModalElement = document.getElementById("imageModal");
+    const imageModal = new bootstrap.Modal(imageModalElement);
 
     let cropper;
     let uploadedImageURL = null;
@@ -89,17 +90,21 @@
 
             imageModal.show();
 
-            modalImage.onload = function () {
+            // Слухаємо подію, коли модалка повністю відобразиться
+            imageModalElement.addEventListener("shown.bs.modal", () => {
+                console.log("Модалка зображення відобразилася і готова до роботи!");
                 if (cropper) {
                     cropper.destroy();
                 }
+                console.log("Working cropper");
 
-                cropper = new Cropper(modalImage, {
-                    aspectRatio: 1,
-                    viewMode: 1,
-                    autoCrop: true
-                });
-            };
+                    cropper = new Cropper(modalImage, {
+                        aspectRatio: 1,
+                        viewMode: 1,
+                        autoCrop: true
+                    });
+            });
+
         }
     });
 
